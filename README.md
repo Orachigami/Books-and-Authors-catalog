@@ -30,7 +30,7 @@ Used system configurations:
 | [PHP](https://windows.php.net/download#php-7.2) | 7.2.7 |
 | [MySQL](https://dev.mysql.com/downloads/mysql/) | 8.0 |
 | [Composer](https://getcomposer.org/download/) | 1.7.2 |
-| Symfony | 4 |
+| [Symfony](https://symfony.com/download) | 4.1.4 |
 
 Before downloading and installing:
 * Read all the [Getting started](https://symfony.com/doc/current/index.html) section
