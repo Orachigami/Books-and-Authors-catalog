@@ -38,7 +38,7 @@ class MainController extends AbstractController
 			$entityManager->persist($author);
 			$entityManager->flush();
 
-			return $this->redirectToRoute('main');
+			return $this->redirectToRoute('authors');
 		}
 		
         return $this->render('authortype.html.twig', array(
@@ -80,7 +80,7 @@ class MainController extends AbstractController
 			$author = $form->getData();
 			$entityManager->flush();
 
-			return $this->redirectToRoute('main');
+			return $this->redirectToRoute('authors');
 		}
 		
         return $this->render('authortype.html.twig', array(

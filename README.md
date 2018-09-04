@@ -10,7 +10,7 @@ The presented web application uses Symfony 4 framework to create an environment 
     * - [X] Attach an *Author*s **Form Validator**
     * - [X] Create an *Author*s list page with a simple template
 5. - [ ] *Book*s catalog
-    * - [ ] Create a *Book* **Entity**
+    * - [X] Create a *Book* **Entity**
     * - [ ] Create a *Book* managing **Form**
     * - [ ] Attach an *Book*s **Form Validator**
     * - [ ] Create a *Book*s list page with a simple template
