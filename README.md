@@ -9,11 +9,11 @@ The presented web application uses Symfony 4 framework to create an environment 
     * - [X] Create an *Author* managing **Form**
     * - [X] Attach an *Author*s **Form Validator**
     * - [X] Create an *Author*s list page with a simple template
-5. - [ ] *Book*s catalog
+5. - [X] *Book*s catalog
     * - [X] Create a *Book* **Entity**
-    * - [ ] Create a *Book* managing **Form**
-    * - [ ] Attach an *Book*s **Form Validator**
-    * - [ ] Create a *Book*s list page with a simple template
+    * - [X] Create a *Book* managing **Form**
+    * - [X] Attach an *Book*s **Form Validator**
+    * - [X] Create a *Book*s list page with a simple template
 6. - [ ] Association assignment between *Book*s and *Author*s
 7. - [ ] Add broshure File field to a *Book* **Entity**
 8. - [ ] Customize basic templates to the more user-friendly ones

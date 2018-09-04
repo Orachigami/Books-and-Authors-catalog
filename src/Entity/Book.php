@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BookRepository")
- * @UniqueEntity(fields={"Name", "Year"})
+ * @UniqueEntity(fields={"Name", "year"})
  * @UniqueEntity("ISBN")
  */
 class Book

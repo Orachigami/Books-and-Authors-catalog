@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome!</title>
+    </head>
+    <body>
+		<a href="{{ path('create-book') }}">Create new Book</a>
+        <ul id="list">
+            {% for item in list %}
+                <li><a href="{{ path('book_page', {'book_id':item.id}) }}">{{ item.Name }} {{ item.Year }} {{ item.ISBN }}</a></li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>

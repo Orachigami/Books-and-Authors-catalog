@@ -24,8 +24,8 @@ class Author
      * @Assert\Length(
      *      min = 4,
      *      max = 64,
-     *      minMessage = "Your first name must be at least {{ limit }} characters long",
-     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     *      minMessage = "Surname must be at least {{ limit }} characters long",
+     *      maxMessage = "Surname cannot be longer than {{ limit }} characters"
      * )
 	 * @Assert\Regex("/^[A-Z][a-z]+(?:-[A-Z][a-z]+){0,}$/")
      */
@@ -36,8 +36,8 @@ class Author
      * @Assert\Length(
      *      min = 4,
      *      max = 64,
-     *      minMessage = "Your first name must be at least {{ limit }} characters long",
-     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     *      minMessage = "First name must be at least {{ limit }} characters long",
+     *      maxMessage = "First name cannot be longer than {{ limit }} characters"
      * )
 	 * @Assert\Regex("/^[A-Z][a-z]+$/")
      */
@@ -48,8 +48,8 @@ class Author
      * @Assert\Length(
      *      min = 4,
      *      max = 64,
-     *      minMessage = "Your first name must be at least {{ limit }} characters long",
-     *      maxMessage = "Your first name cannot be longer than {{ limit }} characters"
+     *      minMessage = "Middle name must be at least {{ limit }} characters long",
+     *      maxMessage = "Middle name cannot be longer than {{ limit }} characters"
      * )
 	 * @Assert\Regex("/^[A-Z][a-z]+$/")
      */

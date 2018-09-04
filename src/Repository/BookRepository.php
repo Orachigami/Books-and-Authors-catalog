@@ -18,7 +18,28 @@ class BookRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Book::class);
     }
-
+	/*
+	* @return Book[] Returns an array of Book objects
+	*/
+	public function getAll(): array
+	{
+		return $this->createQueryBuilder('a')
+            ->orderBy('a.year', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+	}
+	
+	public function findById($value): ?Book
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 //    /**
 //     * @return Book[] Returns an array of Book objects
 //     */
