@@ -2,13 +2,13 @@
 The presented web application uses Symfony 4 framework to create an environment for Books and Authors entities interaction.
 ## Current plan
 1. - [X] Download & Install **Symfony** framework
-2. - [ ] Add **Git** remote repository to a local machine
-3. - [ ] Create an initial **Controller** with a test welcome page
-4. - [ ] *Author*s catalog
-    * - [ ] Create an *Author* **Entity**
-    * - [ ] Create an *Author* managing **Form**
-    * - [ ] Attach an *Author*s **Form Validator**
-    * - [ ] Create an *Author*s list page with a simple template
+2. - [X] Add **Git** remote repository to a local machine
+3. - [X] Create an initial **Controller** with a test welcome page
+4. - [X] *Author*s catalog
+    * - [X] Create an *Author* **Entity**
+    * - [X] Create an *Author* managing **Form**
+    * - [X] Attach an *Author*s **Form Validator**
+    * - [X] Create an *Author*s list page with a simple template
 5. - [ ] *Book*s catalog
     * - [ ] Create a *Book* **Entity**
     * - [ ] Create a *Book* managing **Form**

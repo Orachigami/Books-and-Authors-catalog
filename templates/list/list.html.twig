@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Welcome!</title>
+    </head>
+    <body>
+		<a href="{{ path('create-author') }}">Create new Author</a>
+        <ul id="list">
+            {% for item in list %}
+                <li><a href="{{ path('author_page', {'author_id':item.id}) }}">{{ item.Surname }} {{ item.Name }} {{ item.MiddleName }}</a></li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
