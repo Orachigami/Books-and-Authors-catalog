@@ -2,11 +2,13 @@
 
 namespace App\Form;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class BookType extends AbstractType
 {
@@ -17,7 +19,14 @@ class BookType extends AbstractType
             ->add('year')
             ->add('ISBN')
             ->add('Pages')
-            ->add('save', SubmitType::class, array('label' => 'Submit'))
+			->add('Authors', EntityType::class, array(
+				'class' => Author::class,
+				'choice_label' => 'SurnameAndInitials',
+				'multiple' => true,
+				'expanded' => true,
+				'by_reference' => false
+				)
+			)
         ;
     }
 

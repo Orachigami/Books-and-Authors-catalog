@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -55,6 +57,16 @@ class Book
      */
     private $Pages;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Author", mappedBy="book")
+     */
+    private $Authors;
+
+    public function __construct()
+    {
+        $this->Authors = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +116,37 @@ class Book
     public function setPages(int $Pages): self
     {
         $this->Pages = $Pages;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Author[]
+     */
+    public function getAuthors(): Collection
+    {
+        return $this->Authors;
+    }
+
+    public function addAuthor(Author $author): self
+    {
+        if (!$this->Authors->contains($author)) {
+            $this->Authors[] = $author;
+            $author->setBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthor(Author $author): self
+    {
+        if ($this->Authors->contains($author)) {
+            $this->Authors->removeElement($author);
+            // set the owning side to null (unless already changed)
+            if ($author->getBook() === $this) {
+                $author->setBook(null);
+            }
+        }
 
         return $this;
     }

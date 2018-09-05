@@ -55,6 +55,19 @@ class Author
      */
     private $MiddleName;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Book", inversedBy="Authors")
+     */
+    private $book;
+
+    public function getSurnameAndInitials(): ?string
+    {
+		$str = $this->Surname . ' ' . substr($this->Name, 0, 1) . '.';
+		if (strlen($this->MiddleName) > 0)
+			$str .= ' ' . substr($this->MiddleName, 0, 1). '.';
+        return $str;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +105,18 @@ class Author
     public function setMiddleName(?string $MiddleName): self
     {
         $this->MiddleName = $MiddleName;
+
+        return $this;
+    }
+
+    public function getBook(): ?Book
+    {
+        return $this->book;
+    }
+
+    public function setBook(?Book $book): self
+    {
+        $this->book = $book;
 
         return $this;
     }

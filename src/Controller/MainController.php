@@ -4,11 +4,12 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\AuthorType;
-use App\Form\BookType;
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Author;
 use App\Entity\Book;
-use Symfony\Component\HttpFoundation\Request;
+use App\Form\AuthorType;
+use App\Form\BookType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class MainController extends AbstractController
@@ -18,6 +19,11 @@ class MainController extends AbstractController
      */
     public function index()
     {
+		/*$entityManager = $this->getDoctrine()->getManager();
+		$author = $this->getDoctrine()->getRepository(Author::class)->findById(2);
+		$book = $this->getDoctrine()->getRepository(Book::class)->findById(1);
+		$book->addAuthor($author);
+		$entityManager->flush();*/
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
         ]);
@@ -26,10 +32,11 @@ class MainController extends AbstractController
     /**
      * @Route("/create-author", name="create-author")
      */
-    public function createAuthor(Request $request)
+    public function createAuthor()
     {
 		$author = new Author();
-		$form = $this->createForm(AuthorType::class, $author);
+		$form = $this->createForm(AuthorType::class, $author)
+			->add('delete', SubmitType::class, array('label' => 'Delete'));
 		
 		$form->handleRequest($request);
 
@@ -43,7 +50,6 @@ class MainController extends AbstractController
 
 			return $this->redirectToRoute('authors');
 		}
-		
         return $this->render('form.html.twig', array(
             'form' => $form->createView(),
         ));
@@ -77,9 +83,11 @@ class MainController extends AbstractController
     /**
      * @Route("/authors", name="authors")
      */
-    public function showAuthors()
+    public function showAuthors(Request $request)
     {
-		$authors = $this->getDoctrine()->getRepository(Author::class)->getAll();
+		$page = $request->query->get('page');
+		if (is_numeric($page) && $page < 0) $page = 0;
+		$authors = $this->getDoctrine()->getRepository(Author::class)->getAll($page);
 		
 		foreach ($authors as $author) 
 		{
@@ -89,15 +97,19 @@ class MainController extends AbstractController
 		}
 		
 		return $this->render('list/author_list.html.twig', array(
-			'list' => $authors));
+			'list' => $authors,
+			'page' => $page
+			));
 	}
 	
     /**
      * @Route("/books", name="books")
      */
-    public function showBooks()
+    public function showBooks(Request $request)
     {
-		$books = $this->getDoctrine()->getRepository(Book::class)->getAll();
+		$page = $request->query->get('page');
+		if (is_numeric($page) && $page < 0) $page = 0;
+		$books = $this->getDoctrine()->getRepository(Book::class)->getAll($page);
 		
 		return $this->render('list/book_list.html.twig', array(
 			'list' => $books));
@@ -108,7 +120,8 @@ class MainController extends AbstractController
     public function manageAuthor($author_id, Request $request)
     {
 		$author = $this->getDoctrine()->getRepository(Author::class)->findById($author_id);
-		$form = $this->createForm(AuthorType::class, $author)->add('delete', SubmitType::class, array('label' => 'Delete'));
+		$form = $this->createForm(AuthorType::class, $author)
+			->add('delete', SubmitType::class, array('label' => 'Delete'));
 		
 		$form->handleRequest($request);
 
@@ -136,10 +149,11 @@ class MainController extends AbstractController
     public function manageBook($book_id, Request $request)
     {
 		$book = $this->getDoctrine()->getRepository(Book::class)->findById($book_id);
-		$form = $this->createForm(BookType::class, $book)->add('delete', SubmitType::class, array('label' => 'Delete'));
+		$form = $this->createForm(BookType::class, $book)
+			->add('delete', SubmitType::class, array('label' => 'Delete'))
+            ->add('saveBook', SubmitType::class, array('label' => 'Submit'));
 		
 		$form->handleRequest($request);
-
 		if ($form->isSubmitted() && $form->isValid())
 		{
 			$entityManager = $this->getDoctrine()->getManager();
@@ -150,13 +164,13 @@ class MainController extends AbstractController
 			else
 			{
 				$book = $form->getData();
+				
 			}
 			$entityManager->flush();
 			return $this->redirectToRoute('books');
 		}
-        return $this->render('form.html.twig', array(
+        return $this->render('form_book.html.twig', array(
             'form' => $form->createView(),
         ));
 	}
-	
 }

@@ -22,11 +22,12 @@ class AuthorRepository extends ServiceEntityRepository
 	/*
 	* @return Author[] Returns an array of Author objects
 	*/
-	public function getAll(): array
+	public function getAll($page): array
 	{
 		return $this->createQueryBuilder('a')
             ->orderBy('a.Surname', 'ASC')
-            ->setMaxResults(10)
+			->setFirstResult($page)
+            ->setMaxResults(1)
             ->getQuery()
             ->getResult()
         ;
