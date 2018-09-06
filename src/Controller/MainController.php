@@ -9,6 +9,7 @@ use App\Entity\Author;
 use App\Entity\Book;
 use App\Form\AuthorType;
 use App\Form\BookType;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
@@ -152,8 +153,10 @@ class MainController extends AbstractController
 		$form = $this->createForm(BookType::class, $book)
 			->add('delete', SubmitType::class, array('label' => 'Delete'))
             ->add('saveBook', SubmitType::class, array('label' => 'Submit'));
-		
+		echo $request->query->get('page');
+		$current_brochure = $book->getBrochure();
 		$form->handleRequest($request);
+		$is_brochure_exists = $current_brochure != null && file_exists($this->getParameter('brochures_directory') . $current_brochure);
 		if ($form->isSubmitted() && $form->isValid())
 		{
 			$entityManager = $this->getDoctrine()->getManager();
@@ -164,13 +167,41 @@ class MainController extends AbstractController
 			else
 			{
 				$book = $form->getData();
-				
+				if ($book->getBrochure() != null)
+				{
+					if ($is_brochure_exists) unlink($this->getParameter('brochures_directory') . $current_brochure);
+					$file =  $form->get('brochure')->getData();
+					$filename = md5(uniqid()) . '.' . $file->guessExtension(); 
+					$file->move(
+						$this->getParameter('brochures_directory'),
+						$filename
+					);
+					$book->setBrochure($filename);
+					$current_brochure = $filename;
+				}
+				else
+				{
+					if ($is_brochure_exists)
+					{
+						$book->setBrochure($current_brochure);
+					}
+					else
+					{
+						$book->setBrochure(null);
+						$current_brochure = $this->getParameter('brochures_default_file');
+					}
+				}
 			}
 			$entityManager->flush();
-			return $this->redirectToRoute('books');
+			//return $this->redirectToRoute('books');
+		}
+		else
+		{
+			if (!$is_brochure_exists) $current_brochure = $current_brochure = $this->getParameter('brochures_default_file');
 		}
         return $this->render('form_book.html.twig', array(
             'form' => $form->createView(),
+			'brochure' => $current_brochure
         ));
 	}
 }

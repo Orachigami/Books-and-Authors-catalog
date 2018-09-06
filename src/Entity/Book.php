@@ -62,6 +62,11 @@ class Book
      */
     private $Authors;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $brochure;
+
     public function __construct()
     {
         $this->Authors = new ArrayCollection();
@@ -147,6 +152,18 @@ class Book
                 $author->setBook(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBrochure(): ?string
+    {
+        return $this->brochure;
+    }
+
+    public function setBrochure(?string $brochure): self
+    {
+        $this->brochure = $brochure;
 
         return $this;
     }

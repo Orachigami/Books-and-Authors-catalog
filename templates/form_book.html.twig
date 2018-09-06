@@ -4,6 +4,8 @@
 	{{ form_row(form.year) }}
 	{{ form_row(form.ISBN) }}
 	{{ form_row(form.Pages) }}
+	<img src="{{ asset('uploads/brochures/' ~ brochure) }}" style="max-height: 250px; max-width: 250px;">
+	{{ form_row(form.brochure) }}
 	<ul class="Authors">
 	{{ form_label(form.Authors) }}
 		{% for author in form.Authors %}
