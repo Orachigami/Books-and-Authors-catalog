@@ -34,6 +34,7 @@ class BookType extends AbstractType
 				'by_reference' => false
 				)
 			)
+            ->add('saveBook', SubmitType::class, array('label' => 'Submit'))
         ;
     }
 

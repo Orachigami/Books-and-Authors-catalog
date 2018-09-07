@@ -1,0 +1,11 @@
+{# templates/forms/book_manage.html.twig #}
+{% extends 'forms/book_base.html.twig' %}
+
+{% block brochure %}
+	<img src="{{ asset('uploads/brochures/' ~ brochure) }}" style="max-height: 250px; max-width: 250px;">
+{% endblock %}
+
+{% block buttons %}
+	{{ form_row(form.saveBook) }}
+	{{ form_row(form.delete) }}
+{% endblock %}

@@ -1,0 +1,16 @@
+{# templates/forms/author_base.html.twig #}
+
+{{ form_start(form) }}
+	{{ form_row(form.Surname) }}
+	{{ form_row(form.Name) }}
+	{{ form_row(form.MiddleName) }}
+	<ul class="Books">
+	{#{ form_label(form.Books) }}
+		{% for book in form.Books %}
+					<li>
+						{{ form_row(book) }}
+					</li>
+		{% endfor %#}
+	</ul>
+	{% block buttons %}{% endblock %}
+{{ form_end(form) }}

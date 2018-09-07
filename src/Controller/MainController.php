@@ -51,7 +51,7 @@ class MainController extends AbstractController
 
 			return $this->redirectToRoute('authors');
 		}
-        return $this->render('form.html.twig', array(
+        return $this->render('forms/author_create.html.twig', array(
             'form' => $form->createView(),
         ));
     }
@@ -71,12 +71,21 @@ class MainController extends AbstractController
 			$book = $form->getData();
 
 			$entityManager = $this->getDoctrine()->getManager();
+			
+			$file =  $form->get('brochure')->getData();
+			$filename = md5(uniqid()) . '.' . $file->guessExtension(); 
+			$file->move(
+				$this->getParameter('brochures_directory'),
+				$filename
+			);
+			$book->setBrochure($filename);
+			
 			$entityManager->persist($book);
 			$entityManager->flush();
 
 			return $this->redirectToRoute('main');
 		}
-        return $this->render('form.html.twig', array(
+        return $this->render('forms/book_create.html.twig', array(
             'form' => $form->createView(),
         ));
     }
@@ -121,6 +130,7 @@ class MainController extends AbstractController
     public function manageAuthor($author_id, Request $request)
     {
 		$author = $this->getDoctrine()->getRepository(Author::class)->findById($author_id);
+		if ($author === null) return $this->redirectToRoute('authors');
 		$form = $this->createForm(AuthorType::class, $author)
 			->add('delete', SubmitType::class, array('label' => 'Delete'));
 		
@@ -140,7 +150,7 @@ class MainController extends AbstractController
 			$entityManager->flush();
 			return $this->redirectToRoute('authors');
 		}
-        return $this->render('form.html.twig', array(
+        return $this->render('forms/author_manage.html.twig', array(
             'form' => $form->createView(),
         ));
 	}
@@ -150,23 +160,30 @@ class MainController extends AbstractController
     public function manageBook($book_id, Request $request)
     {
 		$book = $this->getDoctrine()->getRepository(Book::class)->findById($book_id);
+		if ($book === null) return $this->redirectToRoute('books');
 		$form = $this->createForm(BookType::class, $book)
-			->add('delete', SubmitType::class, array('label' => 'Delete'))
-            ->add('saveBook', SubmitType::class, array('label' => 'Submit'));
-		echo $request->query->get('page');
+			->add('delete', SubmitType::class, array('label' => 'Delete'));
+		// $request->query->get('page');
 		$current_brochure = $book->getBrochure();
-		$form->handleRequest($request);
 		$is_brochure_exists = $current_brochure != null && file_exists($this->getParameter('brochures_directory') . $current_brochure);
+		$form->handleRequest($request);
 		if ($form->isSubmitted() && $form->isValid())
 		{
 			$entityManager = $this->getDoctrine()->getManager();
+			$book = $form->getData();
 			if ($form->get('delete')->isClicked())
 			{
+				$authors = $book->getAuthors();
+				foreach($authors as $author)
+				{
+					$author->setBook(null);
+				}
 				$entityManager->remove($book);
+				$entityManager->flush();
+				return $this->redirectToRoute('books');
 			}
 			else
 			{
-				$book = $form->getData();
 				if ($book->getBrochure() != null)
 				{
 					if ($is_brochure_exists) unlink($this->getParameter('brochures_directory') . $current_brochure);
@@ -199,7 +216,7 @@ class MainController extends AbstractController
 		{
 			if (!$is_brochure_exists) $current_brochure = $current_brochure = $this->getParameter('brochures_default_file');
 		}
-        return $this->render('form_book.html.twig', array(
+        return $this->render('forms/book_manage.html.twig', array(
             'form' => $form->createView(),
 			'brochure' => $current_brochure
         ));

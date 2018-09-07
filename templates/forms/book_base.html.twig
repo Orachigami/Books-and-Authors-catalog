@@ -1,10 +1,11 @@
-{# templates/form_book.html.twig #}
+{# templates/forms/base_book.html.twig #}
+
 {{ form_start(form) }}
 	{{ form_row(form.Name) }}
 	{{ form_row(form.year) }}
 	{{ form_row(form.ISBN) }}
 	{{ form_row(form.Pages) }}
-	<img src="{{ asset('uploads/brochures/' ~ brochure) }}" style="max-height: 250px; max-width: 250px;">
+	{% block brochure %}{% endblock %}
 	{{ form_row(form.brochure) }}
 	<ul class="Authors">
 	{{ form_label(form.Authors) }}
@@ -14,6 +15,5 @@
 					</li>
 		{% endfor %}
 	</ul>
-	{{ form_row(form.saveBook) }}
-	{{ form_row(form.delete) }}
+	{% block buttons %}{% endblock %}
 {{ form_end(form) }}
