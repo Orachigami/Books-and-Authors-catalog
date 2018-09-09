@@ -24,10 +24,11 @@ class AuthorRepository extends ServiceEntityRepository
 	*/
 	public function getAll($page): array
 	{
+		$results_per_page = 4;
 		return $this->createQueryBuilder('a')
             ->orderBy('a.Surname', 'ASC')
-			->setFirstResult($page)
-            ->setMaxResults(1)
+			->setFirstResult($page * $results_per_page)
+            ->setMaxResults($results_per_page)
             ->getQuery()
             ->getResult()
         ;

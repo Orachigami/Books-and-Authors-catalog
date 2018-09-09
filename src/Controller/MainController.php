@@ -12,6 +12,7 @@ use App\Form\BookType;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Doctrine\ORM\EntityRepository;
 
 class MainController extends AbstractController
 {
@@ -33,7 +34,7 @@ class MainController extends AbstractController
     /**
      * @Route("/create-author", name="create-author")
      */
-    public function createAuthor()
+    public function createAuthor(Request $request)
     {
 		$author = new Author();
 		$form = $this->createForm(AuthorType::class, $author)
@@ -73,17 +74,20 @@ class MainController extends AbstractController
 			$entityManager = $this->getDoctrine()->getManager();
 			
 			$file =  $form->get('brochure')->getData();
-			$filename = md5(uniqid()) . '.' . $file->guessExtension(); 
-			$file->move(
-				$this->getParameter('brochures_directory'),
-				$filename
-			);
-			$book->setBrochure($filename);
-			
+			if ($file != null)
+			{
+				$filename = md5(uniqid()) . '.' . $file->guessExtension(); 
+				$file->move(
+					$this->getParameter('brochures_directory'),
+					$filename
+				);
+				$book->setBrochure($filename);
+			}
+			else $book->setBrochure(null);
 			$entityManager->persist($book);
 			$entityManager->flush();
 
-			return $this->redirectToRoute('main');
+			return $this->redirectToRoute('books');
 		}
         return $this->render('forms/book_create.html.twig', array(
             'form' => $form->createView(),
@@ -96,9 +100,8 @@ class MainController extends AbstractController
     public function showAuthors(Request $request)
     {
 		$page = $request->query->get('page');
-		if (is_numeric($page) && $page < 0) $page = 0;
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$authors = $this->getDoctrine()->getRepository(Author::class)->getAll($page);
-		
 		foreach ($authors as $author) 
 		{
 			$author->setName(substr($author->getName(), 0, 1) . '.');
@@ -118,7 +121,7 @@ class MainController extends AbstractController
     public function showBooks(Request $request)
     {
 		$page = $request->query->get('page');
-		if (is_numeric($page) && $page < 0) $page = 0;
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$books = $this->getDoctrine()->getRepository(Book::class)->getAll($page);
 		
 		return $this->render('list/book_list.html.twig', array(
@@ -159,9 +162,25 @@ class MainController extends AbstractController
      */
     public function manageBook($book_id, Request $request)
     {
+		$page = $request->query->get('page');
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$book = $this->getDoctrine()->getRepository(Book::class)->findById($book_id);
 		if ($book === null) return $this->redirectToRoute('books');
 		$form = $this->createForm(BookType::class, $book)
+			->add('Authors', EntityType::class, array(
+				'class' => Author::class,
+				'choice_label' => 'SurnameAndInitials',
+				'multiple' => true,
+				'expanded' => true,
+				'by_reference' => false,
+				'query_builder' => function (EntityRepository $er) use ($page) {
+					return $er->createQueryBuilder('a')
+						->orderBy('a.Surname', 'ASC')
+						->setFirstResult($page * $this->getParameter('authors_per_page'))
+						->setMaxResults($this->getParameter('authors_per_page'));
+					}
+				)
+			)
 			->add('delete', SubmitType::class, array('label' => 'Delete'));
 		// $request->query->get('page');
 		$current_brochure = $book->getBrochure();
@@ -218,7 +237,8 @@ class MainController extends AbstractController
 		}
         return $this->render('forms/book_manage.html.twig', array(
             'form' => $form->createView(),
-			'brochure' => $current_brochure
+			'brochure' => $current_brochure,
+			'page' => $page
         ));
 	}
 }

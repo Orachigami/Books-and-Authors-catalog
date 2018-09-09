@@ -15,5 +15,9 @@
 					</li>
 		{% endfor %}
 	</ul>
+	{% if page > 0 %}
+		<a href="{{ app.request.pathinfo ~'/?page='~(page-1) }}">Previous</a>
+	{% endif %}
+	<a href="{{ app.request.pathinfo ~'/?page='~(page+1) }}">Next</a>
 	{% block buttons %}{% endblock %}
 {{ form_end(form) }}

@@ -26,14 +26,6 @@ class BookType extends AbstractType
 				'required' => false
 				)
 			)
-			->add('Authors', EntityType::class, array(
-				'class' => Author::class,
-				'choice_label' => 'SurnameAndInitials',
-				'multiple' => true,
-				'expanded' => true,
-				'by_reference' => false
-				)
-			)
             ->add('saveBook', SubmitType::class, array('label' => 'Submit'))
         ;
     }

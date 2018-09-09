@@ -23,10 +23,11 @@ class BookRepository extends ServiceEntityRepository
 	*/
 	public function getAll($page): array
 	{
+		$results_per_page = 4;
 		return $this->createQueryBuilder('a')
             ->orderBy('a.year', 'DESC')
-			->setFirstResult($page)
-            ->setMaxResults(10)
+			->setFirstResult($page * $results_per_page)
+            ->setMaxResults($results_per_page)
             ->getQuery()
             ->getResult()
         ;
