@@ -1,16 +1,25 @@
 {# templates/forms/author_base.html.twig #}
+{% extends 'base.html.twig' %}
 
-{{ form_start(form) }}
-	{{ form_row(form.Surname) }}
-	{{ form_row(form.Name) }}
-	{{ form_row(form.MiddleName) }}
-	<ul class="Books">
-	{#{ form_label(form.Books) }}
-		{% for book in form.Books %}
-					<li>
-						{{ form_row(book) }}
-					</li>
-		{% endfor %#}
-	</ul>
-	{% block buttons %}{% endblock %}
-{{ form_end(form) }}
+{% block body %}
+	{{ form_start(form) }}
+		{{ form_row(form.Surname) }}
+		{{ form_row(form.Name) }}
+		{{ form_row(form.MiddleName) }}
+		<ul class="Books">
+		{{ form_label(form.books) }}
+			{% for book in form.books %}
+				<li>
+					{{ form_row(book) }}
+				</li>
+			{% endfor %}
+			<li>
+				{% if page > 0 %}
+					<a href="{{ app.request.pathinfo ~'/?page='~(page-1) }}">Previous</a>
+				{% endif %}
+				<a href="{{ app.request.pathinfo ~'/?page='~(page+1) }}">Next</a>
+			</li>
+		</ul>
+		{% block buttons %}{% endblock %}
+	{{ form_end(form) }}
+{% endblock %}

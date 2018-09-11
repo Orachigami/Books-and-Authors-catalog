@@ -16,7 +16,6 @@ class AuthorType extends AbstractType
             ->add('Surname')
             ->add('Name')
             ->add('MiddleName')
-			->add('save', SubmitType::class, array('label' => 'Submit'))
 			;
     }
 

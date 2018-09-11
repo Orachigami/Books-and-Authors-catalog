@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -56,9 +58,15 @@ class Author
     private $MiddleName;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Book", inversedBy="Authors")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Book", inversedBy="authors") 
+     * @ORM\JoinTable(name="authors_books")
      */
-    private $book;
+    private $books;
+
+    public function __construct()
+    {
+        $this->books = new ArrayCollection();
+    }
 
     public function getSurnameAndInitials(): ?string
     {
@@ -109,14 +117,28 @@ class Author
         return $this;
     }
 
-    public function getBook(): ?Book
+    /**
+     * @return Collection|Book[]
+     */
+    public function getBooks(): Collection
     {
-        return $this->book;
+        return $this->books;
     }
 
-    public function setBook(?Book $book): self
+    public function addBook(Book $book): self
     {
-        $this->book = $book;
+        if (!$this->books->contains($book)) {
+            $this->books[] = $book;
+        }
+
+        return $this;
+    }
+
+    public function removeBook(Book $book): self
+    {
+        if ($this->books->contains($book)) {
+            $this->books->removeElement($book);
+        }
 
         return $this;
     }

@@ -26,7 +26,7 @@ class BookType extends AbstractType
 				'required' => false
 				)
 			)
-            ->add('saveBook', SubmitType::class, array('label' => 'Submit'))
+            ->add('saveBook', SubmitType::class, array('label' => 'Save Book'))
         ;
     }
 

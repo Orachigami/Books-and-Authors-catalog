@@ -6,6 +6,13 @@
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
+		{% block menu %}
+			<ul>
+				<li><a href="{{ path('main') }}">Start page</a></li>
+				<li><a href="{{ path('authors') }}">Authors list</a></li>
+				<li><a href="{{ path('books') }}">Books list</a></li>
+			</ul>
+		{% endblock %}
         {% block body %}{% endblock %}
         {% block javascripts %}{% endblock %}
     </body>

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,11 +23,6 @@ class MainController extends AbstractController
      */
     public function index()
     {
-		/*$entityManager = $this->getDoctrine()->getManager();
-		$author = $this->getDoctrine()->getRepository(Author::class)->findById(2);
-		$book = $this->getDoctrine()->getRepository(Book::class)->findById(1);
-		$book->addAuthor($author);
-		$entityManager->flush();*/
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
         ]);
@@ -36,8 +33,25 @@ class MainController extends AbstractController
      */
     public function createAuthor(Request $request)
     {
+		$page = $request->query->get('page');
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$author = new Author();
 		$form = $this->createForm(AuthorType::class, $author)
+			->add('books', EntityType::class, array(
+					'class' => Book::class,
+					'choice_label' => 'Name',
+					'multiple' => true,
+					'expanded' => true,
+					'mapped' => true,
+					'query_builder' => function (EntityRepository $er) use ($page) {
+						return $er->createQueryBuilder('a')
+							->orderBy('a.Name', 'ASC')
+							->setFirstResult($page * $this->getParameter('authors_per_page'))
+							->setMaxResults($this->getParameter('authors_per_page'));
+						}
+					)
+				)
+			->add('save', SubmitType::class, array('label' => 'Create'))
 			->add('delete', SubmitType::class, array('label' => 'Delete'));
 		
 		$form->handleRequest($request);
@@ -54,6 +68,7 @@ class MainController extends AbstractController
 		}
         return $this->render('forms/author_create.html.twig', array(
             'form' => $form->createView(),
+			'page' => $page,
         ));
     }
 	
@@ -62,8 +77,24 @@ class MainController extends AbstractController
      */
     public function createBook(Request $request)
     {
+		$page = $request->query->get('page');
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$book = new Book();
-		$form = $this->createForm(BookType::class, $book);
+		$form = $this->createForm(BookType::class, $book)
+		->add('authors', EntityType::class, array(
+				'class' => Author::class,
+				'choice_label' => 'SurnameAndInitials',
+				'multiple' => true,
+				'expanded' => true,
+                'mapped' => true,
+				'query_builder' => function (EntityRepository $er) use ($page) {
+					return $er->createQueryBuilder('a')
+						->orderBy('a.Surname', 'ASC')
+						->setFirstResult($page * $this->getParameter('books_per_page'))
+						->setMaxResults($this->getParameter('books_per_page'));
+					}
+				)
+			);
 		
 		$form->handleRequest($request);
 
@@ -84,13 +115,14 @@ class MainController extends AbstractController
 				$book->setBrochure($filename);
 			}
 			else $book->setBrochure(null);
+			foreach ($book->getAuthors() as $author) $author->addBook($book);
 			$entityManager->persist($book);
 			$entityManager->flush();
-
 			return $this->redirectToRoute('books');
 		}
         return $this->render('forms/book_create.html.twig', array(
             'form' => $form->createView(),
+			'page' => $page,
         ));
     }
 	
@@ -101,7 +133,7 @@ class MainController extends AbstractController
     {
 		$page = $request->query->get('page');
 		if (!is_numeric($page) || $page < 0) $page = 0;
-		$authors = $this->getDoctrine()->getRepository(Author::class)->getAll($page);
+		$authors = $this->getDoctrine()->getRepository(Author::class)->getAtPage($page, $this->getParameter('authors_per_page'));
 		foreach ($authors as $author) 
 		{
 			$author->setName(substr($author->getName(), 0, 1) . '.');
@@ -122,7 +154,7 @@ class MainController extends AbstractController
     {
 		$page = $request->query->get('page');
 		if (!is_numeric($page) || $page < 0) $page = 0;
-		$books = $this->getDoctrine()->getRepository(Book::class)->getAll($page);
+		$books = $this->getDoctrine()->getRepository(Book::class)->getAtPage($page, $this->getParameter('books_per_page'));
 		
 		return $this->render('list/book_list.html.twig', array(
 			'list' => $books));
@@ -132,13 +164,40 @@ class MainController extends AbstractController
      */
     public function manageAuthor($author_id, Request $request)
     {
+		$page = $request->query->get('page');
+		if (!is_numeric($page) || $page < 0) $page = 0;
 		$author = $this->getDoctrine()->getRepository(Author::class)->findById($author_id);
 		if ($author === null) return $this->redirectToRoute('authors');
 		$form = $this->createForm(AuthorType::class, $author)
-			->add('delete', SubmitType::class, array('label' => 'Delete'));
+			->add('books', EntityType::class, array(
+				'class' => Book::class,
+				'choice_label' => 'Name',
+				'multiple' => true,
+				'expanded' => true,
+                'mapped' => true,
+				'query_builder' => function (EntityRepository $er) use ($page) {
+					return $er->createQueryBuilder('a')
+						->orderBy('a.Name', 'ASC')
+						->setFirstResult($page * $this->getParameter('authors_per_page'))
+						->setMaxResults($this->getParameter('authors_per_page'));
+					}
+				)
+			)
+			->add('save', SubmitType::class, array('label' => 'Submit'))
+			->add('delete', SubmitType::class, array('label' => 'Delete'))
+			->add('books_save', SubmitType::class, array('label' => 'Save Books'))
+			->add('books_delete', SubmitType::class, array('label' => 'Remove Books from Author'));
+		$form->get('save')->getData();
 		
+		$author->getBooks()->takeSnapshot();
+		$arr = new ArrayCollection();
+		foreach ($author->getBooks() as $book)
+		{
+			if (!$arr->contains($book)) {
+				$arr[] = $book;
+			}
+		}
 		$form->handleRequest($request);
-
 		if ($form->isSubmitted() && $form->isValid())
 		{
 			$entityManager = $this->getDoctrine()->getManager();
@@ -149,12 +208,39 @@ class MainController extends AbstractController
 			else
 			{
 				$author = $form->getData();
+				$books = $author->getBooks();
+				$books2 = $author->getBooks()->getSnapshot();
+				if ($form->get('books_save')->isClicked())
+				{
+					/*echo "DIFFS<br>";
+					foreach ($author->getBooks()->getDeleteDiff() as $book) echo $book->getName() . "<br>"; echo "<br>";*/
+					foreach ($books2 as $book)
+					{
+						$author->addBook($book);
+					}
+				}
+				if ($form->get('books_delete')->isClicked())
+				{
+					foreach ($books as $book)
+					{
+						if ($arr->contains($book))
+						{
+							$arr->removeElement($book);
+						}
+					}
+					$books->clear();
+					foreach ($arr as $book)
+					{
+						$author->addBook($book);
+					}
+				}
+				$entityManager->flush();
 			}
-			$entityManager->flush();
-			return $this->redirectToRoute('authors');
+			//return $this->redirectToRoute('authors');
 		}
         return $this->render('forms/author_manage.html.twig', array(
             'form' => $form->createView(),
+			'page' => $page,
         ));
 	}
 	/**
@@ -167,22 +253,23 @@ class MainController extends AbstractController
 		$book = $this->getDoctrine()->getRepository(Book::class)->findById($book_id);
 		if ($book === null) return $this->redirectToRoute('books');
 		$form = $this->createForm(BookType::class, $book)
-			->add('Authors', EntityType::class, array(
+			->add('authors', EntityType::class, array(
 				'class' => Author::class,
 				'choice_label' => 'SurnameAndInitials',
 				'multiple' => true,
 				'expanded' => true,
-				'by_reference' => false,
+                'mapped' => true,
 				'query_builder' => function (EntityRepository $er) use ($page) {
 					return $er->createQueryBuilder('a')
 						->orderBy('a.Surname', 'ASC')
-						->setFirstResult($page * $this->getParameter('authors_per_page'))
-						->setMaxResults($this->getParameter('authors_per_page'));
+						->setFirstResult($page * $this->getParameter('books_per_page'))
+						->setMaxResults($this->getParameter('books_per_page'));
 					}
 				)
 			)
-			->add('delete', SubmitType::class, array('label' => 'Delete'));
-		// $request->query->get('page');
+			->add('delete', SubmitType::class, array('label' => 'Delete Book'))
+			->add('authors_save', SubmitType::class, array('label' => 'Save Authors'))
+			->add('authors_delete', SubmitType::class, array('label' => 'Remove Authors from Book'));
 		$current_brochure = $book->getBrochure();
 		$is_brochure_exists = $current_brochure != null && file_exists($this->getParameter('brochures_directory') . $current_brochure);
 		$form->handleRequest($request);
@@ -190,12 +277,12 @@ class MainController extends AbstractController
 		{
 			$entityManager = $this->getDoctrine()->getManager();
 			$book = $form->getData();
+			$authors = $book->getAuthors();
 			if ($form->get('delete')->isClicked())
 			{
-				$authors = $book->getAuthors();
 				foreach($authors as $author)
 				{
-					$author->setBook(null);
+					$author->removeBook($book);
 				}
 				$entityManager->remove($book);
 				$entityManager->flush();
@@ -203,6 +290,20 @@ class MainController extends AbstractController
 			}
 			else
 			{
+				if ($form->get('authors_save')->isClicked())
+				{
+					foreach ($authors as $author)
+					{
+						$author->addBook($book);
+					}
+				}
+				if ($form->get('authors_delete')->isClicked())
+				{
+					foreach ($authors as $author)
+					{
+						$author->removeBook($book);
+					}
+				}
 				if ($book->getBrochure() != null)
 				{
 					if ($is_brochure_exists) unlink($this->getParameter('brochures_directory') . $current_brochure);
@@ -238,7 +339,7 @@ class MainController extends AbstractController
         return $this->render('forms/book_manage.html.twig', array(
             'form' => $form->createView(),
 			'brochure' => $current_brochure,
-			'page' => $page
+			'page' => $page,
         ));
 	}
 }

@@ -58,18 +58,18 @@ class Book
     private $Pages;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Author", mappedBy="book")
-     */
-    private $Authors;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $brochure;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Author", mappedBy="books")
+     */
+    private $authors;
+
     public function __construct()
     {
-        $this->Authors = new ArrayCollection();
+        $this->authors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -130,14 +130,14 @@ class Book
      */
     public function getAuthors(): Collection
     {
-        return $this->Authors;
+        return $this->authors;
     }
 
     public function addAuthor(Author $author): self
     {
-        if (!$this->Authors->contains($author)) {
-            $this->Authors[] = $author;
-            $author->setBook($this);
+        if (!$this->authors->contains($author)) {
+            $this->authors[] = $author;
+            //$author->setBook($this);
         }
 
         return $this;
@@ -145,13 +145,16 @@ class Book
 
     public function removeAuthor(Author $author): self
     {
-        if ($this->Authors->contains($author)) {
+        /*if ($this->Authors->contains($author)) {
             $this->Authors->removeElement($author);
             // set the owning side to null (unless already changed)
             if ($author->getBook() === $this) {
                 $author->setBook(null);
             }
-        }
+        }*/
+		if ($this->authors->contains($author)) {
+			$this->authors->removeElement($author);
+		}
 
         return $this;
     }

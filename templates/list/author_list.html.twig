@@ -1,19 +1,13 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Welcome!</title>
-    </head>
-    <body>
-		<a href="{{ path('create-author') }}">Create new Author</a>
-        <ul id="list">
-            {% for item in list %}
-                <li><a href="{{ path('author_page', {'author_id':item.id}) }}">{{ item.SurnameAndInitials }}</a></li>
-            {% endfor %}
-        </ul>
-		{% if page > 0 %}
-			<a href="{{ path('authors', {'page':page - 1}) }}">Previous</a>
-		{% endif %}
-		<a href="{{ path('authors', {'page':page + 1}) }}">Next</a>
-    </body>
-</html>
+{% extends 'base.html.twig' %}
+{% block body %}
+	<a href="{{ path('create-author') }}">Create new Author</a>
+	<ul id="list">
+		{% for item in list %}
+			<li><a href="{{ path('author_page', {'author_id':item.id}) }}">{{ item.SurnameAndInitials }}</a></li>
+		{% endfor %}
+	</ul>
+	{% if page > 0 %}
+		<a href="{{ path('authors', {'page':page - 1}) }}">Previous</a>
+	{% endif %}
+	<a href="{{ path('authors', {'page':page + 1}) }}">Next</a>
+{% endblock %}

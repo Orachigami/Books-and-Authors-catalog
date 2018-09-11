@@ -16,9 +16,9 @@ The presented web application uses Symfony 4 framework to create an environment 
     * - [X] Create a *Book*s list page with a simple template
 6. - [X] Association assignment between *Book*s and *Author*s
 7. - [X] Add broshure File field to a *Book* **Entity**
-8. - [ ] Customize basic templates to the more user-friendly ones
-    * - [ ] Ipmrove **Entity** list pages templates
-    * - [ ] Add Menu
+8. - [X] Customize basic templates to the more user-friendly ones
+    * - [X] Ipmrove **Entity** list pages templates
+    * - [X] Add Menu
     
 ## How to start with Symfony on Windows?
 ### Before start

@@ -1,23 +1,29 @@
 {# templates/forms/base_book.html.twig #}
+{% extends 'base.html.twig' %}
 
-{{ form_start(form) }}
-	{{ form_row(form.Name) }}
-	{{ form_row(form.year) }}
-	{{ form_row(form.ISBN) }}
-	{{ form_row(form.Pages) }}
-	{% block brochure %}{% endblock %}
-	{{ form_row(form.brochure) }}
-	<ul class="Authors">
-	{{ form_label(form.Authors) }}
-		{% for author in form.Authors %}
-					<li>
-						{{ form_row(author) }}
-					</li>
-		{% endfor %}
-	</ul>
-	{% if page > 0 %}
-		<a href="{{ app.request.pathinfo ~'/?page='~(page-1) }}">Previous</a>
-	{% endif %}
-	<a href="{{ app.request.pathinfo ~'/?page='~(page+1) }}">Next</a>
-	{% block buttons %}{% endblock %}
-{{ form_end(form) }}
+{% block body %}
+	{{ form_start(form) }}
+		{{ form_row(form.Name) }}
+		{{ form_row(form.year) }}
+		{{ form_row(form.ISBN) }}
+		{{ form_row(form.Pages) }}
+		{% block brochure %}{% endblock %}
+		{{ form_row(form.brochure) }}
+		<ul class="authors">
+		{{ form_label(form.authors) }}
+			{% for author in form.authors %}
+						<li>
+							{{ form_row(author) }}
+						</li>
+			{% endfor %}
+			<li>
+				{% if page > 0 %}
+					<a href="{{ app.request.pathinfo ~'/?page='~(page-1) }}">Previous</a>
+				{% endif %}
+				<a href="{{ app.request.pathinfo ~'/?page='~(page+1) }}">Next</a>
+			</li>
+		</ul>
+		
+		{% block buttons %}{% endblock %}
+	{{ form_end(form) }}
+{% endblock %}

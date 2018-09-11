@@ -22,9 +22,8 @@ class AuthorRepository extends ServiceEntityRepository
 	/*
 	* @return Author[] Returns an array of Author objects
 	*/
-	public function getAll($page): array
+	public function getAtPage($page, $results_per_page): array
 	{
-		$results_per_page = 4;
 		return $this->createQueryBuilder('a')
             ->orderBy('a.Surname', 'ASC')
 			->setFirstResult($page * $results_per_page)
