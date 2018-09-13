@@ -6,4 +6,8 @@
 			<li><a href="{{ path('book_page', {'book_id':item.id}) }}">{{ item.Name }} {{ item.Year }} {{ item.ISBN }}</a></li>
 		{% endfor %}
 	</ul>
+	{% if page > 0 %}
+		<a href="{{ path('books', {'page':page - 1}) }}">Previous</a>
+	{% endif %}
+	<a href="{{ path('books', {'page':page + 1}) }}">Next</a>
 {% endblock %}
