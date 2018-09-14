@@ -1,4 +1,5 @@
 #: translations/messages.en.yaml
+# Books forms
 Name: Name
 Year: Year
 I s b n: ISBN
@@ -8,3 +9,11 @@ Authors: Authors
 Save Book: Save Book
 Delete Book: Delete Book
 Remove Authors from Book: Remove Authors from Book 
+
+# Authors forms
+Surname: Surname
+Middle name: Middle name
+Books: Books
+Save: Save
+Delete: Delete
+Remove Books from Author: Remove Books from Author
